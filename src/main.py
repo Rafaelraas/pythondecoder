@@ -3,13 +3,7 @@ import sys
 from bs4 import BeautifulSoup
 
 def print_grid_from_unstructured_doc(doc_url: str):
-    """
-    Fetches an unstructured (published) Google Doc, extracts data using regex,
-    and prints the character grid. Handles concatenated data without spaces.
-
-    Args:
-        doc_url: The URL of the Google Doc published to the web.
-    """
+    
     try:
         print(f"Fetching data from: {doc_url}")
         response = requests.get(doc_url)
@@ -17,7 +11,6 @@ def print_grid_from_unstructured_doc(doc_url: str):
 
         # Use BeautifulSoup to parse HTML and get only the text
         soup = BeautifulSoup(response.text, 'html.parser')
-        text_content = soup.get_text()
         table = soup.find('table')
         table_data = []
         for row in table.find_all('tr'):
@@ -25,7 +18,6 @@ def print_grid_from_unstructured_doc(doc_url: str):
             for cell in row.find_all(['td', 'th']):
                 row_data.append(cell.get_text())
             table_data.append(row_data)
-            print(row_data)
 
         points = []
         for row in table_data[1:]:
@@ -33,13 +25,6 @@ def print_grid_from_unstructured_doc(doc_url: str):
             char = row[1]
             y = int(row[2])
             points.append({'x': x, 'y': y, 'char': char})
-        
-        
-        
-        # Debugging output
-        print(f"Table : {table_data}")
-        print(f"Found {len(points)} points in the document.")
-        print(f"Points: {points}")
         
         if not points:
             print("No valid coordinate data found in the document.")
@@ -56,8 +41,7 @@ def print_grid_from_unstructured_doc(doc_url: str):
                 grid[p['y']][p['x']] = p['char']
 
         # Print the grid
-        print(f"\nCharacter grid ({max_y + 1} rows, {max_x + 1} columns):")
-
+        #print(f"\nCharacter grid ({max_y + 1} rows, {max_x + 1} columns):")
         for row in reversed(grid):
             print("".join(row))
 
@@ -67,8 +51,22 @@ def print_grid_from_unstructured_doc(doc_url: str):
         print(f"An error occurred: {type(e).__name__} - {e}", file=sys.stderr)
 
 
+def create_staircase(nums):
+  step = 1
+  subsets = []
+  while len(nums) != 0:
+    if len(nums) >= step:
+      subsets.append(nums[0:step])
+      nums = nums[step:]
+      step += 1
+    else:
+      return False
+      
+  return subsets
+
 if __name__ == '__main__':
-    
+    print(create_staircase( [1, 2, 3, 4, 5, 6]))
+
     google_doc_url = input("Enter the published Google Doc URL: ")
 
     if google_doc_url.strip():
